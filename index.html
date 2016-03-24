@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>TODO List</title>
+
+  <link rel='stylesheet' href='css/bootstrap.min.css' type='text/css' media='all'>
+   
+</head>
+<body>
+
+<div class="container">
+  <div class="col-md-8 col-md-offset-2">
+    <h1>TODO App</h1>
+
+    <div class="list-group" id="js-tasks-list">
+      <!--
+      <button type="button" class="list-group-item" data-toggle="modal" data-target="#edit-task">
+        1. Cras justo odio
+        <i class="glyphicon glyphicon-remove pull-right"></i>
+      </button>
+      -->
+    </div>
+
+    <form>
+      <div class="form-group">
+        <input type="text" class="form-control" name="task-name" placeholder="Write up something" id="new-task">
+      </div>
+      <div class="form-group">
+        <button type="button" class="btn btn-success" id="addButton">Add A Task</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+  var button = document.getElementById("addButton");
+  var input = document.getElementById("new-task");
+  var list = document.getElementById("js-tasks-list");
+
+  button.onclick = function(event) {
+    if(input.value != "") {
+
+      var listButton = document.createElement("button");
+      listButton.className = "list-group-item";
+      listButton.setAttribute("data-toggle", "modal");
+      listButton.setAttribute("data-target", "#edit-task");
+
+      listButton.onclick = function(event) {
+        var editInput = document.getElementById("edit-input");
+        editInput.value = listButton.innerText;
+
+        var hiddenInput = document.getElementById("original-edit-input");
+        hiddenInput.value = listButton.innerText;
+      }
+
+      var text = document.createTextNode(input.value);
+
+      var delButton = document.createElement("i");
+      delButton.className = "glyphicon glyphicon-remove pull-right";
+      delButton.onclick = function(event) {
+        //TODO: remove element
+      }
+
+      listButton.appendChild(text);
+      listButton.appendChild(delButton);
+
+      list.appendChild(listButton);
+      input.value = "";
+    }
+  }
+</script>
+
+<!--
+<script type="text/javascript">
+  $('#myModal').on('shown.bs.modal', function () {
+    $('#myInput').focus()
+  })
+</script>
+-->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="edit-task">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Edit</h4>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control" name="task-name" placeholder="Task name" id="edit-input">
+        <input type="hidden" id="original-edit-input">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>
