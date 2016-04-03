@@ -37,52 +37,6 @@
 
 </div>
 
-<script type="text/javascript">
-  var button = document.getElementById("addButton");
-  var input = document.getElementById("new-task");
-  var list = document.getElementById("js-tasks-list");
-
-  button.onclick = function(event) {
-    if(input.value != "") {
-
-      var listButton = document.createElement("button");
-      listButton.className = "list-group-item";
-      listButton.setAttribute("data-toggle", "modal");
-      listButton.setAttribute("data-target", "#edit-task");
-
-      listButton.onclick = function(event) {
-        var editInput = document.getElementById("edit-input");
-        editInput.value = listButton.innerText;
-
-        var hiddenInput = document.getElementById("original-edit-input");
-        hiddenInput.value = listButton.innerText;
-      }
-
-      var text = document.createTextNode(input.value);
-
-      var delButton = document.createElement("i");
-      delButton.className = "glyphicon glyphicon-remove pull-right";
-      delButton.onclick = function(event) {
-        //TODO: remove element
-      }
-
-      listButton.appendChild(text);
-      listButton.appendChild(delButton);
-
-      list.appendChild(listButton);
-      input.value = "";
-    }
-  }
-</script>
-
-<!--
-<script type="text/javascript">
-  $('#myModal').on('shown.bs.modal', function () {
-    $('#myInput').focus()
-  })
-</script>
--->
-
 <div class="modal fade" tabindex="-1" role="dialog" id="edit-task">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -91,15 +45,97 @@
         <h4 class="modal-title">Edit</h4>
       </div>
       <div class="modal-body">
-        <input type="text" class="form-control" name="task-name" placeholder="Task name" id="edit-input">
-        <input type="hidden" id="original-edit-input">
+        <input type="text" class="form-control" name="task-name" placeholder="Task name" id="edit-task-value">
+        <input type="hidden" id="edit-task-id">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" id="edit-task-save" data-dismiss="modal">Save changes</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<script type="text/javascript">
+  var list = document.getElementById("js-tasks-list"); 
+  var taskValueEdit = document.getElementById("edit-task-value");
+  var taskIdEdit = document.getElementById("edit-task-id");
+
+  var savedTasks = localStorage.getItem('tasks'); 
+  if(savedTasks) {
+    var tasks = JSON.parse(savedTasks);
+  } else {
+    var tasks = {};
+  }
+
+  /////////////////////////////////////////////////////////////   
+  // Renders tasklist from tasks object
+  var renderTasks = function() { 
+    list.innerHTML = '';
+    for(var id in tasks) { 
+      var taskValue = tasks[id]; 
+
+      // Prepare elements
+      var task = document.createElement("button"); 
+      task.className = "list-group-item"; 
+      task.setAttribute("data-toggle", "modal"); 
+      task.setAttribute("data-target", "#edit-task"); 
+      task.setAttribute("data-id", id); 
+
+      var itemValue = document.createTextNode(taskValue); 
+
+      var delButton = document.createElement("i"); 
+      delButton.className = "glyphicon glyphicon-remove pull-right";
+
+      // Append elements to DOM
+      task.appendChild(itemValue); 
+      task.appendChild(delButton); 
+      list.appendChild(task); 
+      
+      // Event handlers
+      task.onclick = function(event) { 
+        taskValueEdit.value = taskValue; 
+        taskIdEdit.value = id;
+      }
+
+      delButton.onclick = function(event) { 
+        event.stopPropagation(); 
+        delete tasks[id]; 
+        renderTasks(); 
+      }
+    }
+
+    var tasksJson = JSON.stringify(tasks);
+    localStorage.setItem('tasks', tasksJson);
+  }
+
+  renderTasks();
+
+  /////////////////////////////////////////////////////////////
+  // Adding new task
+  var lastTaskId = 0; 
+
+  var addTaskButton = document.getElementById("addButton");
+  var newTaskInput = document.getElementById("new-task");
+  addTaskButton.onclick = function(event) { 
+    if(newTaskInput.value != "") { 
+      var id = ++lastTaskId;
+      tasks[id] = newTaskInput.value; 
+      newTaskInput.value = "";
+      renderTasks();
+
+    }
+  }
+
+  /////////////////////////////////////////////////////////////
+  // Saving task
+  var saveButton = document.getElementById('edit-task-save'); 
+  saveButton.onclick = function(event) {
+    tasks[ taskIdEdit.value ] = taskValueEdit.value; 
+    renderTasks();
+  }
+
+
+</script>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
